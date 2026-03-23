@@ -57,21 +57,21 @@ public class GameEngine{
                 this.config.put("word_length", 4);
                 this.config.put("timer", 3);
                 this.config.put("chances", 6);
-                this.words_file_path = "../../../4_letter_words.csv";
+                this.words_file_path = "../../resources/4_letter_words.csv";
                 break;
 
             case 2:
                 this.config.put("word_length", 5);
                 this.config.put("timer", 4);
                 this.config.put("chances", 7);
-                this.words_file_path = "../../../5_letter_words.csv";
+                this.words_file_path = "../../resources/5_letter_words.csv";
                 break;
 
             case 3:
                 this.config.put("word_length", 6);
                 this.config.put("timer", 5);
                 this.config.put("chances", 8);
-                this.words_file_path = "../../../6_letter_words.csv";
+                this.words_file_path = "../../resources/6_letter_words.csv";
                 break;
 
             default:

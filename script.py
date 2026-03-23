@@ -1,8 +1,7 @@
-
-for i in range(5, 11):
+for i in range(4, 11):
     words = list()
     word_size = i # characters
-    with open("words.txt", "r") as f:
+    with open("./wordle/resources/words.txt", "r") as f:
         for word in f:
             if len(word) - 1 == word_size:
                 words.append(word[:-1])
