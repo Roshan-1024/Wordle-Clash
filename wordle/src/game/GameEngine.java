@@ -1,3 +1,5 @@
+package game;
+
 import java.util.Scanner;
 import java.util.Vector;
 import java.util.Random;
@@ -16,15 +18,15 @@ import java.nio.file.Paths;
 
 // Instantiate to start a new instance of a Wordle Game
 public class GameEngine{
-    Vector<String> words;
-    Vector<String> guesses;
-    HashMap<String, Integer> config;
+    Vector<String> words; // stores all the words from the csv file
+    Vector<String> guesses; // stores the user guesses
+    HashMap<String, Integer> config; // configuration settings
     String words_file_path = "";
     String username;
     String correctWord;
+    boolean isCorrectGuess; // After a makeGuess() this is updated
 
     Scanner sc;
-    // TODO: Add makeGuess(), isGameOver()
 
     GameEngine(String username){
         this.username = username;
@@ -36,6 +38,7 @@ public class GameEngine{
 
         this.sc = new Scanner(System.in);
         this.guesses = new Vector<>();
+        this.isCorrectGuess = false;
 
         System.out.println("Welcome to Wordle Clash, " + this.username);
     }
@@ -97,57 +100,62 @@ public class GameEngine{
         return guess.equals(this.correctWord);
     }
 
-    void start(){
-        // TODO: Build the async. timer
-        System.out.println("Start Guessing...");
-        for(int i = 0; i < this.config.get("chances"); i++){
-            System.out.print("Chance-"+(i+1)+": ");
-            String guess = this.sc.next().toLowerCase();
+    boolean makeGuess(String guess){
+        // invalid guesss word length
+        if(guess.length() != this.config.get("word_length")){
+            System.out.println("Invalid length! Try again.");
+            return false;
+        }
+        // TODO: Also, check if valid word is entered.
+        guesses.add(guess);
 
-            // invalid guesss word length
-            if (guess.length() != this.config.get("word_length")) {
-                System.out.println("Invalid length! Try again.");
-                i--;
-                continue;
+        // check correct letters
+        System.out.println("Correct letters: ");
+        for(int j = 0; j < this.config.get("word_length"); j++){
+            if(guess.charAt(j) == this.correctWord.charAt(j)){
+                System.out.print(guess.charAt(j));
             }
-            // TODO: Also, check if valid word is entered.
-            guesses.add(guess);
-
-            // check correct letters
-            System.out.println("Correct letters: ");
-            for(int j = 0; j < this.config.get("word_length"); j++){
-                if(guess.charAt(j) == this.correctWord.charAt(j)){
-                    System.out.print(guess.charAt(j));
-                }
-                else{
-                    System.out.print("#");
-                }
-            }
-            System.out.println();
-            // TODO: Print correct letters, but incorrect positions
-
-            if(isCorrect(guess)){
-                System.out.println("Congrats you won!!");
-                return;
+            else{
+                System.out.print("#");
             }
         }
+        System.out.println();
+        // TODO: Print correct letters, but incorrect positions
 
-        System.out.println("Correct word was: "+ this.correctWord);
+        if(isCorrect(guess)){
+            this.isCorrectGuess = true;
+        }
+        return true;
     }
 
     public static void main(String[] args){
+        // TODO: This needs to be shipped to Server.java
         GameEngine engine = new GameEngine("Roshan");
         engine.menu();
         try{
             engine.load_data();
         }
-        catch (Exception e) {
+        catch(Exception e){
             System.out.println("Error loading file!");
             e.printStackTrace();
             return;
         }
-        engine.start();
 
+        System.out.println("Start Guessing...");
+        for(int i = 0; i < engine.config.get("chances"); i++){
+            System.out.print("Chance-"+(i+1)+": ");
+            Scanner scan = new Scanner(System.in);
+            String guess = scan.next().toLowerCase();
+            if(!engine.makeGuess(guess)){ // if not made an appropriate guess
+                i--;
+                continue;
+            }
+            if(engine.isCorrectGuess){
+                System.out.println("Congrats you won!!");
+            }
+        }
+
+        System.out.println("Correct word was: "+ engine.correctWord);
         System.out.println("Game ends");
     }
 }
