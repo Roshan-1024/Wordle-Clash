@@ -127,35 +127,4 @@ public class GameEngine{
         }
         return true;
     }
-
-    public static void main(String[] args){
-        // TODO: This needs to be shipped to Server.java
-        GameEngine engine = new GameEngine("Roshan");
-        engine.menu();
-        try{
-            engine.load_data();
-        }
-        catch(Exception e){
-            System.out.println("Error loading file!");
-            e.printStackTrace();
-            return;
-        }
-
-        System.out.println("Start Guessing...");
-        for(int i = 0; i < engine.config.get("chances"); i++){
-            System.out.print("Chance-"+(i+1)+": ");
-            Scanner scan = new Scanner(System.in);
-            String guess = scan.next().toLowerCase();
-            if(!engine.makeGuess(guess)){ // if not made an appropriate guess
-                i--;
-                continue;
-            }
-            if(engine.isCorrectGuess){
-                System.out.println("Congrats you won!!");
-            }
-        }
-
-        System.out.println("Correct word was: "+ engine.correctWord);
-        System.out.println("Game ends");
-    }
 }
