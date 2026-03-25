@@ -1,34 +1,38 @@
-import game.GameEngine;
-
 import java.io.*;
 import java.net.*;
 
-public class Server {
+public class Server{
     static String winner = null;
+    static PrintWriter out1, out2;
+
     ServerSocket serverSocket;
     int port;
-    Server(){
+
+    Server() throws Exception{
         this.port = 5000;
-        this.serverSocket = new ServerSocket(this.port);
+        serverSocket = new ServerSocket(this.port);
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception{
+        Server server = new Server();
+
         System.out.println("Server started... Waiting for 2 clients");
 
-        Socket player1 = this.serverSocket.accept();
+        Socket player1 = server.serverSocket.accept();
         System.out.println("Client 1 connected");
 
-        Socket player2 = this.serverSocket.accept();
+        Socket player2 = server.serverSocket.accept();
         System.out.println("Client 2 connected");
 
         // First take their usernames
         BufferedReader in1 = new BufferedReader(new InputStreamReader(player1.getInputStream()));
         BufferedReader in2 = new BufferedReader(new InputStreamReader(player2.getInputStream()));
+
         String player1_username = in1.readLine();
         String player2_username = in2.readLine();
 
-        PrintWriter out1 = new PrintWriter(player1.getOutputStream(), true);
-        PrintWriter out2 = new PrintWriter(player2.getOutputStream(), true);
+        out1 = new PrintWriter(player1.getOutputStream(), true);
+        out2 = new PrintWriter(player2.getOutputStream(), true);
 
         // Send START first
         out1.println("START");
@@ -40,14 +44,14 @@ public class Server {
         // game ends after this.
     }
 
-    public static synchronized void declareWinner(String playerName, PrintWriter out){
+    public static synchronized void declareWinner(String playerName){
         if(winner == null){
             winner = playerName;
-            out.println("RESULT: YOU WIN");
+
+            out1.println("RESULT: " + playerName + " WON");
+            out2.println("RESULT: " + playerName + " WON");
+
             System.out.println(playerName + " wins!");
-        }
-        else{
-            out.println("RESULT: YOU LOSE");
         }
     }
 
@@ -55,49 +59,20 @@ public class Server {
         try{
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            //
-            // Game logic goes here...
-            //
-            GameEngine engine = new GameEngine(username);
-            engine.menu();
-            try{
-                engine.load_data();
-            }
-            catch(Exception e){
-                System.out.println("Error loading file!");
-                e.printStackTrace();
-                return;
-            }
-            System.out.println("Start guessing...");
-            for(int i = 0; i < engine.config.get("chances"); i++){
-                System.out.print("Chance-"+ (i+1)+": ");
-                Scanner sc = new Scanner(System.in);
-                String guess = sc.next().toLowerCase();
-                if(!engine.makeGuess(guess)){ // if not made an appropriate guess
-                    i--;
-                    continue;
-                }
+            String msg;
 
-                engine.currentAttempt++;
-                if(engine.isCorrectGuess){
-                    System.out.println("Congrats you won");
+            while ((msg = in.readLine()) != null){
+                if("DONE".equals(msg)){
+                    declareWinner(username);
+                    break;
                 }
             }
 
-
-            // If game over
-            String msg = in.readLine();
-
-            if("DONE".equals(msg)){
-                declareWinner(username, out);
-            }
             socket.close();
-
         }
         catch(Exception e){
-                e.printStackTrace();
+            e.printStackTrace();
         }
     }
 }
