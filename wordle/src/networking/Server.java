@@ -76,10 +76,11 @@ public class Server {
                 Scanner sc = new Scanner(System.in);
                 String guess = sc.next().toLowerCase();
                 if(!engine.makeGuess(guess)){ // if not made an appropriate guess
-
                     i--;
                     continue;
                 }
+
+                engine.currentAttempt++;
                 if(engine.isCorrectGuess){
                     System.out.println("Congrats you won");
                 }

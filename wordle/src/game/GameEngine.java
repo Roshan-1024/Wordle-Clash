@@ -25,6 +25,7 @@ public class GameEngine{
     String username;
     String correctWord;
     boolean isCorrectGuess; // After a makeGuess() this is updated
+    int currentAttempt;
 
     Scanner sc;
 
@@ -39,6 +40,7 @@ public class GameEngine{
         this.sc = new Scanner(System.in);
         this.guesses = new Vector<>();
         this.isCorrectGuess = false;
+        this.currentAttempt = 0;
 
         System.out.println("Welcome to Wordle Clash, " + this.username);
     }
