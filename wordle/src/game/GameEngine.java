@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 // 1. Ask the user about the difficulty level (Easy: 4 letters; Medium: 5 letters; Hard: 6 letters)
 // 2. Load the right csv file and pick a random word.
 // 3. Game Starts. Timer (3min) starts asynchronously (probably a daemon).
-// 4. User gets 6 chances.
+// 4. User gets 6 attempts.
 // 5. Check valid word entered or not. Valid length check for the cli version.
 // 6. After a word is entered, check if string matches.
 // Game ends.
@@ -34,7 +34,7 @@ public class GameEngine{
         this.config = new HashMap<>();
         this.config.put("word_length", null);
         this.config.put("timer", null); // 3 minutes
-        this.config.put("chances", 6);
+        this.config.put("maxAttempts", 6);
 
         this.sc = new Scanner(System.in);
         this.guesses = new Vector<>();
@@ -56,21 +56,21 @@ public class GameEngine{
             case 1:
                 this.config.put("word_length", 4);
                 this.config.put("timer", 3);
-                this.config.put("chances", 6);
+                this.config.put("maxAttempts", 6);
                 this.words_file_path = "../../resources/4_letter_words.csv";
                 break;
 
             case 2:
                 this.config.put("word_length", 5);
                 this.config.put("timer", 4);
-                this.config.put("chances", 7);
+                this.config.put("maxAttempts", 7);
                 this.words_file_path = "../../resources/5_letter_words.csv";
                 break;
 
             case 3:
                 this.config.put("word_length", 6);
                 this.config.put("timer", 5);
-                this.config.put("chances", 8);
+                this.config.put("maxAttempts", 8);
                 this.words_file_path = "../../resources/6_letter_words.csv";
                 break;
 
