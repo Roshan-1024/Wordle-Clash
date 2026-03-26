@@ -1,5 +1,7 @@
 package networking;
 
+import game.GameEngine;
+
 import java.io.*;
 import java.net.*;
 
@@ -36,9 +38,49 @@ public class Server{
         out1 = new PrintWriter(player1.getOutputStream(), true);
         out2 = new PrintWriter(player2.getOutputStream(), true);
 
+
+        // NOTE: when game starts, clients respond with the difficulty choice
+        // Then the server checks compatibility of the players
+        // if not, game stops. Else game on.
+
+        int diff1 = Integer.parseInt(
+                in1.readLine()
+                .substring("Difficulty:".length())
+        );
+        int diff2 = Integer.parseInt(
+                in2.readLine()
+                .substring("Difficulty:".length())
+        );
+
+        System.out.println("Player 1 chose difficulty: " + diff1);
+        System.out.println("Player 2 chose difficulty: " + diff2);
+
+        if(diff1 != diff2){
+            System.out.println("ERROR: Incompatible players. Keep your difficulty level same");
+            out1.println("ERROR");
+            out2.println("ERROR");
+
+            player1.close();
+            player2.close();
+            return;
+        }
+
+
+        // server has the difficulty.
+        // server choses the word
+
+        // Server sends a common correct word.
+        GameEngine engine = new GameEngine("Server");
+        engine.applyDifficulty(diff1); // both are equal
+        engine.load_data();
+        engine.decideWord();
+        out1.println("CORRECT_WORD:" + engine.correctWord);
+        out2.println("CORRECT_WORD:" + engine.correctWord);
+
         // Send START first
         out1.println("START");
         out2.println("START");
+
 
         // Then start threads
         new Thread(() -> handleClient(player1, player1_username)).start();
@@ -57,21 +99,20 @@ public class Server{
         }
     }
 
-    public static void handleClient(Socket socket, String username){
+    public static void handleClient(Socket player, String username){
         try{
             BufferedReader in = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream()));
+                    new InputStreamReader(player.getInputStream()));
 
             String msg;
-
-            while ((msg = in.readLine()) != null){
+            while((msg = in.readLine()) != null){
                 if("DONE".equals(msg)){
                     declareWinner(username);
                     break;
                 }
             }
 
-            socket.close();
+            player.close();
         }
         catch(Exception e){
             e.printStackTrace();

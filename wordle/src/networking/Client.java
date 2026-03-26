@@ -28,16 +28,28 @@ public class Client{
             // Take username
             System.out.print("Enter username: ");
             username = sc.nextLine();
-            out.println(username);
+            out.println(username); // send server the username
 
             System.out.println("Connected as " + username);
+
+            GameEngine engine = new GameEngine(username);
+            int difficulty = engine.promptDifficuilty();
+            out.println("Difficulty:" + difficulty);
 
             // Wait for the START signal from the Server
             String msg;
             while((msg = in.readLine()) != null){
-                if(msg.equals("START")){
+                if(msg.startsWith("CORRECT_WORD:")){
+                    engine.correctWord = msg.substring("CORRECT_WORD:".length()).trim();
+                    engine.applyDifficulty(difficulty);
+                    engine.load_data();
+                }
+                else if(msg.equals("START")){
                     System.out.println("Game starting...");
                     break;
+                }
+                else if(msg.equals("ERROR")){
+                    throw new Exception("Server Shutdown. Stopping Clients...");
                 }
             }
 
@@ -45,7 +57,7 @@ public class Client{
             new Thread(this::listenToServer).start();
 
             // Game starts...
-            runGame(sc);
+            runGame(engine, sc);
         }
         catch(Exception e){
             e.printStackTrace();
@@ -76,16 +88,11 @@ public class Client{
         }
     }
 
-    private void runGame(Scanner sc){
+    private void runGame(GameEngine engine, Scanner sc){
         try{
-            GameEngine engine = new GameEngine(username);
-
-            engine.menu();
-            engine.load_data(); // can cause exceptions
-
             System.out.println("Start Guessing...");
 
-
+            // Game Loop
             while(!engine.isGameOver()){
                 System.out.print("Attempt-" + (engine.currentAttempt+1) + ": ");
                 String guess = sc.next().toLowerCase();
@@ -100,10 +107,10 @@ public class Client{
                     out.println("DONE"); // notify the server
                     return;
                 }
-            }
-            if(!engine.isCorrectGuess){
-                System.out.println("You failed to guess the word.");
-                out.println("DONE");
+                if(!engine.isCorrectGuess){
+                    System.out.println("You failed to guess the word.");
+                    out.println("DONE");
+                }
             }
         }
         catch(Exception e){

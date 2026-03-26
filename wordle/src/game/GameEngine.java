@@ -23,7 +23,7 @@ public class GameEngine{
     HashMap<String, Integer> config; // configuration settings
     String words_file_path = "";
     String username;
-    String correctWord;
+    public String correctWord;
     public boolean isCorrectGuess; // After a makeGuess() this is updated
     public int currentAttempt;
 
@@ -45,7 +45,7 @@ public class GameEngine{
         System.out.println("Welcome to Wordle Clash, " + this.username);
     }
 
-    public void menu(){
+    public int promptDifficuilty(){
         System.out.println("Choose difficulty: ");
         System.out.println("1. Easy: 4 words");
         System.out.println("2. Medium: 5 words");
@@ -55,57 +55,72 @@ public class GameEngine{
         int choice = -1;
         choice = this.sc.nextInt();
 
+        return choice;
+    }
+
+    public void applyDifficulty(int choice){
         switch(choice){
             case 1:
                 this.config.put("word_length", 4);
                 this.config.put("timer", 3);
                 this.config.put("maxAttempts", 6);
-                this.words_file_path = "../resources/4_letter_words.csv";
+                this.words_file_path = "/4_letter_words.csv";
                 break;
 
             case 2:
                 this.config.put("word_length", 5);
                 this.config.put("timer", 4);
                 this.config.put("maxAttempts", 7);
-                this.words_file_path = "../resources/5_letter_words.csv";
+                this.words_file_path = "/5_letter_words.csv";
                 break;
 
             case 3:
                 this.config.put("word_length", 6);
                 this.config.put("timer", 5);
                 this.config.put("maxAttempts", 8);
-                this.words_file_path = "../resources/6_letter_words.csv";
+                this.words_file_path = "/6_letter_words.csv";
                 break;
 
             default:
                 System.out.println("Invalid option selected");
                 return;
         }
-
     }
 
-    // Loads the words csv file into a vector and picks a random word
-    public void load_data() throws Exception{
-        this.words = new Vector<>(
-            java.util.Arrays.stream(
-                Files.readString(Paths.get(this.words_file_path)).split(",")
-            )
-            .map(String::trim)
-            .toList()
-        );
-
+    public void decideWord(){
         Random rand = new Random();
         int n = rand.nextInt(this.words.size());
         this.correctWord = this.words.get(n);
     }
 
+    // Loads the words csv file into a vector
+    public void load_data() throws Exception{
+        java.io.InputStream is = getClass().getResourceAsStream(this.words_file_path);
+
+        if(is == null){
+            throw new java.io.FileNotFoundException("Could not find file in classpath: " + this.words_file_path);
+        }
+
+        String content = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+
+        this.words = new Vector<>(
+            java.util.Arrays.stream(content.split(","))
+                .map(String::trim)
+                .toList()
+        );
+
+        is.close(); // Clean up the stream
+    }
+
     boolean isCorrect(String guess){
         return guess.equals(this.correctWord);
     }
+
     public boolean isGameOver(){
         return this.isCorrectGuess ||
                this.currentAttempt >= this.config.get("maxAttempts");
     }
+
     public boolean makeGuess(String guess){
         // invalid guesss word length
         if(guess.length() != this.config.get("word_length")){
@@ -137,6 +152,8 @@ public class GameEngine{
                 System.out.print("#");
             }
         }
+
+        // TODO: Check if same word guessed again.
         System.out.println();
         // TODO: Print correct letters, but incorrect positions
 
