@@ -45,7 +45,7 @@ public class GameEngine{
         System.out.println("Welcome to Wordle Clash, " + this.username);
     }
 
-    public int promptDifficuilty(){
+    public int promptDifficulty(){
         System.out.println("Choose difficulty: ");
         System.out.println("1. Easy: 4 words");
         System.out.println("2. Medium: 5 words");

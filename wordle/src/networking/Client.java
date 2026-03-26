@@ -33,7 +33,7 @@ public class Client{
             System.out.println("Connected as " + username);
 
             GameEngine engine = new GameEngine(username);
-            int difficulty = engine.promptDifficuilty();
+            int difficulty = engine.promptDifficulty();
             out.println("Difficulty:" + difficulty);
 
             // Wait for the START signal from the Server
@@ -105,6 +105,7 @@ public class Client{
                 if(engine.isCorrectGuess){
                     System.out.println("Game completed.");
                     out.println("DONE"); // notify the server
+                    System.out.println("Correct word: " + engine.correctWord);
                     return;
                 }
             }
