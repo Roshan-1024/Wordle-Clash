@@ -87,7 +87,7 @@ public class Client{
 
 
             while(!engine.isGameOver()){
-                System.out.print("Enter guess: ");
+                System.out.print("Attempt-" + (engine.currentAttempt+1) + ": ");
                 String guess = sc.next().toLowerCase();
 
                 if(!engine.makeGuess(guess)){
