@@ -50,6 +50,7 @@ public class GameEngine{
         System.out.println("1. Easy: 4 words");
         System.out.println("2. Medium: 5 words");
         System.out.println("3. Hard: 6 words");
+        System.out.print("Choice: ");
 
         int choice = -1;
         choice = this.sc.nextInt();
@@ -111,8 +112,20 @@ public class GameEngine{
             System.out.println("Invalid length! Try again.");
             return false;
         }
-        // TODO: Also, check if valid word is entered.
-        guesses.add(guess);
+
+        // Check if word is valid
+        boolean validWord = false;
+        for(String word : words){
+            if(word.equalsIgnoreCase(guess)){
+                guesses.add(guess);
+                validWord = true;
+                break;
+            }
+        }
+        if(!validWord){
+            System.out.println("Invalid word! Try again.");
+            return false;
+        }
 
         // check correct letters
         System.out.println("Correct letters: ");
