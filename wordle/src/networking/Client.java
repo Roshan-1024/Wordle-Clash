@@ -107,10 +107,6 @@ public class Client{
                     out.println("DONE"); // notify the server
                     return;
                 }
-                if(!engine.isCorrectGuess){
-                    System.out.println("You failed to guess the word.");
-                    out.println("DONE");
-                }
             }
         }
         catch(Exception e){
