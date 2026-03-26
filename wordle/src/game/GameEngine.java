@@ -24,12 +24,12 @@ public class GameEngine{
     String words_file_path = "";
     String username;
     String correctWord;
-    boolean isCorrectGuess; // After a makeGuess() this is updated
-    int currentAttempt;
+    public boolean isCorrectGuess; // After a makeGuess() this is updated
+    public int currentAttempt;
 
     Scanner sc;
 
-    GameEngine(String username){
+    public GameEngine(String username){
         this.username = username;
 
         this.config = new HashMap<>();
@@ -45,7 +45,7 @@ public class GameEngine{
         System.out.println("Welcome to Wordle Clash, " + this.username);
     }
 
-    void menu(){
+    public void menu(){
         System.out.println("Choose difficulty: ");
         System.out.println("1. Easy: 4 words");
         System.out.println("2. Medium: 5 words");
@@ -59,21 +59,21 @@ public class GameEngine{
                 this.config.put("word_length", 4);
                 this.config.put("timer", 3);
                 this.config.put("maxAttempts", 6);
-                this.words_file_path = "../../resources/4_letter_words.csv";
+                this.words_file_path = "../resources/4_letter_words.csv";
                 break;
 
             case 2:
                 this.config.put("word_length", 5);
                 this.config.put("timer", 4);
                 this.config.put("maxAttempts", 7);
-                this.words_file_path = "../../resources/5_letter_words.csv";
+                this.words_file_path = "../resources/5_letter_words.csv";
                 break;
 
             case 3:
                 this.config.put("word_length", 6);
                 this.config.put("timer", 5);
                 this.config.put("maxAttempts", 8);
-                this.words_file_path = "../../resources/6_letter_words.csv";
+                this.words_file_path = "../resources/6_letter_words.csv";
                 break;
 
             default:
@@ -84,7 +84,7 @@ public class GameEngine{
     }
 
     // Loads the words csv file into a vector and picks a random word
-    void load_data() throws Exception{
+    public void load_data() throws Exception{
         this.words = new Vector<>(
             java.util.Arrays.stream(
                 Files.readString(Paths.get(this.words_file_path)).split(",")
@@ -101,8 +101,11 @@ public class GameEngine{
     boolean isCorrect(String guess){
         return guess.equals(this.correctWord);
     }
-
-    boolean makeGuess(String guess){
+    public boolean isGameOver(){
+        return this.isCorrectGuess ||
+               this.currentAttempt >= this.config.get("maxAttempts");
+    }
+    public boolean makeGuess(String guess){
         // invalid guesss word length
         if(guess.length() != this.config.get("word_length")){
             System.out.println("Invalid length! Try again.");

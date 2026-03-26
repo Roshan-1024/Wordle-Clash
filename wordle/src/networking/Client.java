@@ -1,3 +1,5 @@
+package networking;
+
 import game.GameEngine;
 
 import java.io.*;
