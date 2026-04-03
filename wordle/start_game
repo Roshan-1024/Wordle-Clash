@@ -1,0 +1,79 @@
+#!/bin/bash
+
+start_session(){
+	###########################################
+	# creates a session with a default window
+	###########################################
+	tmux new-session -ds $session_name -c ~/Desktop/java_mini_project/wordle/
+	if [[ $? == 0 ]]; then
+		echo "session created."
+	fi
+	tmux rename-window -t $session_name:0 "Game Engine"
+	if [[ $? == 0 ]]; then
+		echo "Renamed 1st window to Game Engine"
+	fi
+	tmux send-keys -t $session_name:0 "nvim src/game/GameEngine.java" C-m
+	if [[ $? == 0 ]]; then
+		echo "GameEngine file opened."
+	fi
+
+	###############################################################
+	# Second window has 2 panes in vsplit: server and client code
+	###############################################################
+	tmux new-window -t $session_name -n "Server & Client" -c ~/Desktop/java_mini_project/wordle/
+	if [[ $? == 0 ]]; then
+		echo "New Window created for Server and Client code."
+	fi
+	tmux split-window -ht $session_name -c ~/Desktop/java_mini_project/wordle/
+	if [[ $? == 0 ]]; then
+		echo "Hsplit for 2nd window done."
+	fi
+	tmux send-keys -t $session_name:1.0 "nvim src/networking/Server.java" C-m
+	if [[ $? == 0 ]]; then
+		echo "Server file opened."
+	fi
+	tmux send-keys -t $session_name:1.1 "nvim src/networking/Client.java" C-m
+	if [[ $? == 0 ]]; then
+		echo "Client file opened."
+	fi
+
+	#####################################################################
+	# Third window has 3 panes: two for clients and bottom one for server
+	#####################################################################
+	tmux new-window -t $session_name -c ~/Desktop/java_mini_project/wordle/
+	if [[ $? == 0 ]]; then
+		echo "New Window created for running the server & clients."
+	fi
+	tmux rename-window -t $session_name:2 "executing code"
+	if [[ $? == 0 ]]; then
+		echo "Renamed 3rd window to executing code"
+	fi
+	tmux split-window -vt $session_name:2.0 -c ~/Desktop/java_mini_project/wordle/
+	if [[ $? == 0 ]]; then
+		echo "Split window vertically."
+	fi
+	tmux split-window -ht $session_name:2.0 -c ~/Desktop/java_mini_project/wordle/
+	if [[ $? == 0 ]]; then
+		echo "Split window horizontally"
+	fi
+
+	tmux send-keys -t $session_name:2.0 "java -cp 'bin:resources' networking.Client"
+	tmux send-keys -t $session_name:2.1 "java -cp 'bin:resources' networking.Client"
+	tmux send-keys -t $session_name:2.2 "java -cp 'bin:resources' networking.Server" 
+
+
+	# Attach the server
+	tmux attach
+}
+
+#################################################
+#			MAIN			#
+#################################################
+session_name="wordle"
+
+# prints "can't find session: session_name" if doesn't exists.
+tmux has-session -t $session_name
+if [[ $? == 0 ]]; then
+	tmux kill-session -t $session_name
+fi
+start_session
